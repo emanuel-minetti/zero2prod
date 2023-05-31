@@ -1,9 +1,7 @@
 use std::net::TcpListener;
+use sqlx::{Connection, PgConnection};
+use zero2prod::configuration::get_configuration;
 
-// No .await call, therefore no need for `spawn_app` to be async now.
-// We are also running tests, so it is not worth it to propagate errors:
-// if we fail to perform the required setup we can just panic and crash
-// all the things.
 fn spawn_app() -> String {
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     // We retrieve the port assigned to us by the OS
@@ -17,11 +15,6 @@ fn spawn_app() -> String {
     format!("http://127.0.0.1:{}", port)
 }
 
-// `tokio::test` is the testing equivalent of `tokio::main`.
-// It also spares you from having to specify the `#[test]` attribute.
-//
-// You can inspect what code gets generated using
-// `cargo expand --test health_check` (<- name of the test file)
 #[tokio::test]
 async fn health_check_works() {
     let address = spawn_app();
@@ -42,6 +35,11 @@ async fn health_check_works() {
 async fn subscribe_returns_a_200_for_valid_form_data() {
     // Arrange
     let app_address = spawn_app();
+    let configuration = get_configuration().expect("Failed to read configuration");
+    let connection_string = configuration.database.connection_string();
+    let connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres.");
     let client = reqwest::Client::new();
     // Act
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";

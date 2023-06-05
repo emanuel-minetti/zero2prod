@@ -93,6 +93,9 @@ jobs:
           SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Linting
         run: cargo clippy -- -D warnings
+
+# think about code coverage, may be the following
+
 #
 #  coverage:
 #    name: Code coverage

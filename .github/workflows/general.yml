@@ -29,8 +29,8 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v3
-#      - uses: dtolnay/rust-toolchain@stable
-#      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
         with:
           key: sqlx-${{ env.SQLX_VERSION }}
       - name: Install sqlx-cli

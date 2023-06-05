@@ -1,9 +1,6 @@
 name: Rust
 
 on:
-  # NB: this differs from the book's project!
-  # These settings allow us to run this specific CI pipeline for PRs against
-  # this specific branch (a.k.a. book chapter).
   push:
     branches:
       - master
@@ -32,8 +29,8 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+#      - uses: dtolnay/rust-toolchain@stable
+#      - uses: Swatinem/rust-cache@v2
         with:
           key: sqlx-${{ env.SQLX_VERSION }}
       - name: Install sqlx-cli
@@ -51,16 +48,16 @@ jobs:
       - name: Run tests
         run: cargo test
 
-#  fmt:
-#    name: Rustfmt
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: dtolnay/rust-toolchain@stable
-#        with:
-#          components: rustfmt
-#      - name: Enforce formatting
-#        run: cargo fmt --check
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Enforce formatting
+        run: cargo fmt --check
 #
 #  clippy:
 #    name: Clippy

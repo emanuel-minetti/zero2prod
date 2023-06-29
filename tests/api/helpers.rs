@@ -34,9 +34,9 @@ impl TestUser {
             password: Uuid::new_v4().to_string(),
         }
     }
-    async fn store(&self, pool: &PgPool) {
+    async fn store(&self, _pool: &PgPool) {
         let salt = SaltString::generate(&mut rand::thread_rng());
-        let password_hash = Argon2::new(
+        let _password_hash = Argon2::new(
             Algorithm::Argon2id,
             Version::V0x13,
             Params::new(15000, 2, 1, None).unwrap(),

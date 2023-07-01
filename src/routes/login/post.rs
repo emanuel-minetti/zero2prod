@@ -50,10 +50,7 @@ pub async fn login(
                 mac.finalize().into_bytes()
             };
             let response = HttpResponse::SeeOther()
-                .insert_header((
-                    LOCATION,
-                    format!("/login?error={query_string}&tag={hmac_tag:x}"),
-                ))
+                .insert_header((LOCATION, format!("/login?{query_string}&tag={hmac_tag:x}")))
                 .finish();
             Err(InternalError::from_response(e, response))
         }

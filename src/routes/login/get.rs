@@ -1,3 +1,4 @@
+use actix_web::cookie::Cookie;
 use actix_web::http::header::ContentType;
 use actix_web::{HttpRequest, HttpResponse};
 
@@ -8,7 +9,7 @@ pub async fn login_form(request: HttpRequest) -> HttpResponse {
             format!("<p><i>{}</i></p>", cookie.value())
         }
     };
-    HttpResponse::Ok()
+    let mut response = HttpResponse::Ok()
         .content_type(ContentType::html())
         .body(format!(
             r#"
@@ -42,5 +43,9 @@ pub async fn login_form(request: HttpRequest) -> HttpResponse {
 </body>
 </html>
             "#
-        ))
+        ));
+    response
+        .add_removal_cookie(&Cookie::new("_flash", ""))
+        .unwrap();
+    response
 }

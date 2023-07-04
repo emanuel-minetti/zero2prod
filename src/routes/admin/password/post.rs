@@ -6,6 +6,7 @@ use actix_web::{web, HttpResponse};
 use actix_web_flash_messages::FlashMessage;
 use secrecy::{ExposeSecret, Secret};
 use sqlx::PgPool;
+use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
@@ -46,6 +47,24 @@ pub async fn change_password(
             }
             AuthError::UnexpectedError(_) => Err(e500(e)),
         };
+    }
+
+    let trimmed_password_length = form
+        .0
+        .new_password
+        .expose_secret()
+        .trim()
+        .graphemes(true)
+        .count();
+    if trimmed_password_length < 12 {
+        FlashMessage::error("The password is too short. It should be at least 12 characters long.")
+            .send();
+        return Ok(see_other("/admin/password"));
+    }
+    if trimmed_password_length > 128 {
+        FlashMessage::error("The password is too long. It should be at most 128 characters long.")
+            .send();
+        return Ok(see_other("/admin/password"));
     }
 
     todo!()

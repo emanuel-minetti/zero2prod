@@ -96,6 +96,11 @@ async fn run(
             .route("/login", web::get().to(routes::login_form))
             .route("/login", web::post().to(routes::login))
             .route("/admin/dashboard", web::get().to(routes::admin_dashboard))
+            .route(
+                "/admin/password",
+                web::get().to(routes::change_password_form),
+            )
+            .route("/admin/password", web::post().to(routes::change_password))
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())

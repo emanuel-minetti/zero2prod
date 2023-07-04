@@ -101,6 +101,7 @@ async fn run(
                 web::get().to(routes::change_password_form),
             )
             .route("/admin/password", web::post().to(routes::change_password))
+            .route("/admin/logout", web::post().to(routes::log_out))
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())

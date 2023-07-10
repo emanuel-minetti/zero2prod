@@ -16,15 +16,9 @@ async fn you_must_be_logged_in_to_access_get_newsletter_page() {
 async fn being_logged_in_you_can_access_newsletter_page() {
     // Arrange
     let app = spawn_app().await;
+    app.test_user.login(&app).await;
 
-    // Act - Part 1 - Login
-    app.post_login(&serde_json::json!({
-        "username": &app.test_user.username,
-        "password": &app.test_user.password,
-    }))
-    .await;
-
-    // Act -Part 2 - Get newsletter form
+    // Act
     let html_page = app.get_newsletter_html().await;
 
     // Assert
@@ -35,6 +29,7 @@ async fn being_logged_in_you_can_access_newsletter_page() {
 async fn newsletters_are_not_delivered_to_unconfirmed_subscribers() {
     // Arrange
     let app = spawn_app().await;
+    app.test_user.login(&app).await;
     create_unconfirmed_subscriber(&app).await;
 
     Mock::given(any())
@@ -43,14 +38,7 @@ async fn newsletters_are_not_delivered_to_unconfirmed_subscribers() {
         .mount(&app.email_server)
         .await;
 
-    // Act - Part 1 - Login
-    app.post_login(&serde_json::json!({
-        "username": &app.test_user.username,
-        "password": &app.test_user.password,
-    }))
-    .await;
-
-    // Act - Part 2 - Issue Newsletter
+    // Act
     let newsletter_request_body = serde_json::json!({
         "title": "Newsletter title",
         "text_content": "Newsletter body as plain text",
@@ -67,6 +55,7 @@ async fn newsletters_are_not_delivered_to_unconfirmed_subscribers() {
 async fn newsletters_are_delivered_to_confirmed_subscribers() {
     // Arrange
     let app = spawn_app().await;
+    app.test_user.login(&app).await;
     create_confirmed_subscriber(&app).await;
 
     Mock::given(path("/email"))
@@ -76,14 +65,7 @@ async fn newsletters_are_delivered_to_confirmed_subscribers() {
         .mount(&app.email_server)
         .await;
 
-    // Act - Part 1 - Login
-    app.post_login(&serde_json::json!({
-        "username": &app.test_user.username,
-        "password": &app.test_user.password,
-    }))
-    .await;
-
-    // Act - Part 2 - Issue Newsletter
+    // Act
     let newsletter_request_body = serde_json::json!({
         "title": "Newsletter title",
         "text_content": "Newsletter body as plain text",
@@ -99,6 +81,7 @@ async fn newsletters_are_delivered_to_confirmed_subscribers() {
 async fn newsletters_returns_400_for_invalid_data() {
     // Arrange
     let app = spawn_app().await;
+    app.test_user.login(&app).await;
     let test_cases = vec![
         (
             serde_json::json!({
@@ -112,13 +95,6 @@ async fn newsletters_returns_400_for_invalid_data() {
             "missing content",
         ),
     ];
-
-    // Act - Part 1 - Login
-    app.post_login(&serde_json::json!({
-        "username": &app.test_user.username,
-        "password": &app.test_user.password,
-    }))
-    .await;
 
     for (invalid_body, error_message) in test_cases {
         // Act - Part 2 - Issue Newsletter

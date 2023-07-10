@@ -1,7 +1,16 @@
 use actix_web::http::header::ContentType;
 use actix_web::HttpResponse;
+use actix_web_flash_messages::IncomingFlashMessages;
+use std::fmt::Write;
 
-pub async fn newsletter_form() -> Result<HttpResponse, actix_web::Error> {
+pub async fn newsletter_form(
+    flash_messages: IncomingFlashMessages,
+) -> Result<HttpResponse, actix_web::Error> {
+    let mut msg_html = String::new();
+    flash_messages
+        .iter()
+        .for_each(|m| writeln!(msg_html, "<p><i>{}</i></p>", m.content()).unwrap());
+
     Ok(HttpResponse::Ok()
         .content_type(ContentType::html())
         .body(format!(
@@ -13,6 +22,7 @@ pub async fn newsletter_form() -> Result<HttpResponse, actix_web::Error> {
     <title>Post Newsletter</title>
 </head>
 <body>
+    {msg_html}
     Please enter the details for the new issue of your newsletter:
     <form method="post" action="/admin/newsletter">
         <label>

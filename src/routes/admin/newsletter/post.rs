@@ -1,8 +1,10 @@
 use crate::domain::SubscriberEmail;
 use crate::email_client::EmailClient;
+use crate::utils::see_other;
 use actix_web::http::header::HeaderValue;
 use actix_web::http::{header, StatusCode};
 use actix_web::{web, HttpResponse, ResponseError};
+use actix_web_flash_messages::FlashMessage;
 use anyhow::Context;
 use sqlx::PgPool;
 use std::fmt::Formatter;
@@ -79,7 +81,8 @@ pub async fn newsletter(
             }
         }
     }
-    Ok(HttpResponse::Ok().finish())
+    FlashMessage::info("The newsletter issue has been published!").send();
+    Ok(see_other("/admin/newsletter"))
 }
 
 struct ConfirmedSubscriber {

@@ -1,0 +1,3 @@
+- Test local
+- Test in production
+- Do exercises from Chapter 8 
